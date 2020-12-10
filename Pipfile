@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+jupyter = "*"
+
+[packages]
+plotly = "==4.11.0"
+pandas = "*"
+psycopg2-binary = "*"
+pyyaml = "*"
+dash = "*"
+dash-bootstrap-components = "*"
+requests = "*"
+sql-metadata = "*"
+
+[requires]
+python_version = "3.7"
