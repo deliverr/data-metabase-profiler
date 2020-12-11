@@ -1,4 +1,5 @@
 from _collections import defaultdict
+import json
 from typing import Dict, List
 import plotly
 import plotly.graph_objects as go
@@ -75,9 +76,12 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
 
     user_values = []
     for id in card_ids:
-        for user in users_by_card_id[id]:
-            targets.append(labels.index(user))
-            user_values.append(card_runs[(card_runs.first_name == user) & (card_runs.card_id == id)].runs.tolist()[0])
+        if id in users_by_card_id:
+            for user in users_by_card_id[id]:
+                targets.append(labels.index(user))
+                user_values.append(card_runs[(card_runs.first_name == user) & (card_runs.card_id == id)].runs.tolist()[0])
+        else:
+            print(f"No users for for card_id {id}, {json.dumps(users_by_card_id)}")
 
     values += normalize(user_values)
 

@@ -4,7 +4,6 @@ import snowflake as snow
 
 
 def treemap(days_back: int):
-    #df = pd.read_csv("treemap/Data1.csv")
     df = get_card_results_pandas(6859, {'days_back': days_back})
 
     df = df[df.period == 'this']

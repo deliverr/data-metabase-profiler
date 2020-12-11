@@ -4,7 +4,6 @@ from metabase import get_card_results_pandas
 import plotly
 
 def stacked_bar_chart(days_back: int):
-    #df = pd.read_csv("stacked_bar/Snowflake-daily-usage-by-warehouse.csv")
     df = get_card_results_pandas(3218, {'days_back': days_back})
     df['warehouse_name'] = df.warehouse_name.str.lower()
     warehouse_names = df \

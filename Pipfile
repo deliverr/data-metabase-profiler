@@ -15,6 +15,7 @@ dash = "*"
 dash-bootstrap-components = "*"
 requests = "*"
 sql-metadata = "*"
+requests-cache = "*"
 
 [requires]
 python_version = "3.7"

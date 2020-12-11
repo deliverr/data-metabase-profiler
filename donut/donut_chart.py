@@ -5,7 +5,6 @@ from metabase import get_card_results_pandas
 
 
 def donut_chart(days_back: int):
-    #df = pd.read_csv("donut/Snowflake-warehouse-proportions.csv")
     df = get_card_results_pandas(3221, params = { 'days_back': days_back })
     df['warehouse_name'] = df.warehouse_name.str.lower()
     df = df.sort_values(by='warehouse_name')

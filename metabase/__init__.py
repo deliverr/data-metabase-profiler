@@ -5,11 +5,18 @@ from typing import Dict
 import flask
 import os
 import pandas as pd
-import requests
+from requests_cache import CachedSession
+from requests import codes
 
 __DATABASE_ID_SNOWFLAKE__ = os.getenv('METABASE_DATABASE_ID_SNOWFLAKE', '6')
 __METABASE_URL__ = os.getenv('METABASE_URL', 'http://localhost')
 
+requests = CachedSession(
+    expire_after=60 * 60 * 24, # 24 hours
+    allowable_codes=(200, 201, 202, 204),
+    allowable_methods=('GET', 'POST'),
+    old_data_on_error=True
+)
 
 def get_metabase_token() -> str:
     if flask.has_request_context() and 'metabase.SESSION' in flask.request.cookies:
@@ -61,6 +68,6 @@ def get_table(id: int) -> Dict:
                                 'X-Metabase-Session': get_metabase_token()
                                 }
                        )
-    if res.status_code == requests.codes.not_found:
+    if res.status_code == codes.not_found:
         return None
     return res.json()

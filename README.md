@@ -1,2 +1,3 @@
 # metabase-profiler
-Profile Metabase report usage in terms of Snowflake data warehouse costs. 
+Profiles Metabase usage of the Snowflake data warehouse, especially highlighting the most costly reports.
+
