@@ -10,10 +10,13 @@ def layout(days_back: int):
     content_first_row = dbc.Row(
         [
             dbc.Col(
-                dcc.Graph(id='donut', figure=donut_chart(days_back)), width=6
+                dcc.Graph(id='donut', figure=donut_chart(days_back)), width=5
             ),
             dbc.Col(
-                dcc.Graph(id='stacked-bar', figure=stacked_bar_chart(days_back)), width=6
+                html.Span(), width=1
+            ),
+            dbc.Col(
+                dcc.Graph(id='stacked-bar', figure=stacked_bar_chart(days_back)), width=5
             )
         ]
     )
