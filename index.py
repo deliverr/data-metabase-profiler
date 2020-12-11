@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from app import app, server
+from application import application, server
 from dash.dependencies import Input, Output
 import re
 import virtual_warehouses
@@ -60,13 +60,13 @@ def serve_layout():
     ])
 
 
-app.layout = serve_layout
+application.layout = serve_layout
 
 
-@app.callback(Output('page-content', 'children'),
-              Output('days-back', 'children'),
-              Output('navbar', 'children'),
-              [Input('url', 'pathname'), Input('url', 'hash')])
+@application.callback(Output('page-content', 'children'),
+                      Output('days-back', 'children'),
+                      Output('navbar', 'children'),
+                      [Input('url', 'pathname'), Input('url', 'hash')])
 def display_page(pathname, hash):
     if hash is not None:
         days_back = parse_days_back_hash(hash)
@@ -82,4 +82,4 @@ def display_page(pathname, hash):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, use_reloader=True)
+    application.run_server(debug=True, host='0.0.0.0')

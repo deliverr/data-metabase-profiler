@@ -7,9 +7,8 @@ import os
 import pandas as pd
 import requests
 
-__DATABASE_ID_SNOWFLAKE__ = '6'
-# TODO: get from a dropdown selection
-__DAYS_BACK__ = '30'
+__DATABASE_ID_SNOWFLAKE__ = os.getenv('METABASE_DATABASE_ID_SNOWFLAKE', '6')
+__METABASE_URL__ = os.getenv('METABASE_URL', 'http://localhost')
 
 
 def get_metabase_token() -> str:
@@ -26,7 +25,7 @@ def get_card_results_pandas(card_id: int, params: Dict[str, str]) -> pd.DataFram
         "target": ["variable", ["template-tag", key]], "value": value}
         for key, value in params.items()
     ]
-    res = requests.post(f'https://metabase.deliverr.com/api/card/{card_id}/query',
+    res = requests.post(f'{__METABASE_URL__}/api/card/{card_id}/query',
                         json={ "ignore_cache": False, "parameters": vars },
                         headers={'Content-Type': 'application/json',
                                  'X-Metabase-Session': get_metabase_token()
@@ -47,7 +46,7 @@ def get_all_cards(database_id=__DATABASE_ID_SNOWFLAKE__) -> Dict:
     :param database_id:
     :return:
     """
-    res = requests.get(f'https://metabase.deliverr.com/api/card',
+    res = requests.get(f'{__METABASE_URL__}/api/card',
                        params={'f': 'database', 'model_id': database_id},
                        headers={'Content-Type': 'application/json',
                                 'X-Metabase-Session': get_metabase_token()
@@ -57,7 +56,7 @@ def get_all_cards(database_id=__DATABASE_ID_SNOWFLAKE__) -> Dict:
 
 
 def get_table(id: int) -> Dict:
-    res = requests.get(f'https://metabase.deliverr.com/api/table/{id}',
+    res = requests.get(f'{__METABASE_URL__}/api/table/{id}',
                        headers={'Content-Type': 'application/json',
                                 'X-Metabase-Session': get_metabase_token()
                                 }

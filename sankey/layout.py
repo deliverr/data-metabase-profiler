@@ -4,7 +4,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import json
-from app import app
+from application import application
 from .metabase_table_usage_sankey import sankey
 
 
@@ -58,7 +58,7 @@ def get_card_by_id(id: int) -> Dict:
     return None
 
 
-@app.callback(
+@application.callback(
     Output('sankey', 'figure'),
     [Input('cards-dropdown', 'value')])
 def update_output(value):

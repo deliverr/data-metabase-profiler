@@ -4,12 +4,12 @@ Lists Metabase report cards, and the tables the queries reference
 import json
 import pandas as pd
 import sql_metadata
-from metabase import __DAYS_BACK__, get_all_cards, get_card_results_pandas, get_table
+from metabase import get_all_cards, get_card_results_pandas, get_table
 
 
 def main():
     report_cards = get_all_cards()
-    active_cards = get_card_results_pandas(6942, params={ 'days_back': __DAYS_BACK__ })
+    active_cards = get_card_results_pandas(6942, params={ 'days_back': 30 })
     card_ids_to_runs = pd.Series(active_cards.runs, index=active_cards.card_id).to_dict()
     print(f"Retrieved {len(report_cards)} report cards")
 
