@@ -8,7 +8,8 @@ application = dash.Dash(__name__,
                         suppress_callback_exceptions=True,
                         meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}],
-                        title='Metabase Profiler'
+                        title='Metabase Profiler',
+                        url_base_pathname='/profiler/'
                         )
 server = application.server
 server.secret_key = os.environ['MBP_SECRET_KEY']
