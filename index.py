@@ -4,6 +4,7 @@ import dash_html_components as html
 from application import application, server
 from dash.dependencies import Input, Output
 import re
+from metabase import is_authorized, login_url
 import virtual_warehouses
 import treemap
 import sankey
@@ -42,6 +43,9 @@ def generate_navbar(days_back: int):
 
 
 def serve_layout():
+    if not is_authorized():
+        return dcc.Link("You will first need to login to Metabase, then return to /profiler", href=login_url())
+
     return html.Div([
         dbc.Row([
             dbc.Col([

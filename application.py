@@ -13,3 +13,8 @@ application = dash.Dash(__name__,
                         )
 server = application.server
 server.secret_key = os.environ['MBP_SECRET_KEY']
+
+
+@application.server.route("/profiler/health")
+def ping():
+    return 'OK'
