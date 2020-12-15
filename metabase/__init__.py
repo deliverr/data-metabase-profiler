@@ -3,6 +3,7 @@ Reads queries from Metabase, writes to a migration table and attempts queries th
 """
 from typing import Dict
 import flask
+import json
 import os
 import pandas as pd
 from requests_cache import CachedSession
@@ -17,6 +18,11 @@ cached_requests = CachedSession(
     allowable_methods=('GET', 'POST'),
     old_data_on_error=True
 )
+
+
+def lower_columns(df: pd.DataFrame):
+    df.columns = [col.lower() for col in df.columns]
+    return df
 
 
 def get_metabase_token() -> str:
@@ -46,17 +52,13 @@ def get_card_results_pandas(card_id: int, params: Dict[str, str]) -> pd.DataFram
         "target": ["variable", ["template-tag", key]], "value": value}
         for key, value in params.items()
     ]
-    res = cached_requests.post(f'{__METABASE_URL__}/api/card/{card_id}/query',
-                               json={ "ignore_cache": False, "parameters": vars },
-                               headers={'Content-Type': 'application/json',
+    res = cached_requests.post(f'{__METABASE_URL__}/api/card/{card_id}/query/json',
+                               data={ "parameters": json.dumps(vars) },
+                               headers={'Content-Type': 'application/x-www-form-urlencoded',
                                  'X-Metabase-Session': get_metabase_token()
                                  }
                                )
-    results = res.json()
-    return pd.DataFrame(
-        data=results["data"]["rows"],
-        columns=[col["name"].lower() for col in results["data"]["cols"]]
-    )
+    return lower_columns(pd.DataFrame(res.json()))
 
 
 def get_all_cards(database_id=__DATABASE_ID_SNOWFLAKE__) -> Dict:

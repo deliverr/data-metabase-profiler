@@ -15,11 +15,6 @@ SNOW_COST_PER_CREDIT = float(os.getenv('SNOWFLAKE_COST_PER_CREDIT', default=3.0)
 table_sizes_raw = pd.read_csv('snowflake/table_sizes.csv')
 
 
-def lower_columns(df: pd.DataFrame):
-    df.columns = [col.lower() for col in df.columns]
-    return df
-
-
 def cost_from_credits(df: pd.DataFrame, credits_col: str, cost_col: str):
     df[cost_col] = (df[credits_col] * SNOW_COST_PER_CREDIT).round()
     return df
