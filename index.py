@@ -21,9 +21,9 @@ def parse_days_back_hash(hash: str) -> int:
 def generate_navbar(days_back: int):
     return dbc.NavbarSimple(
         children=[
-            dbc.NavItem(dbc.NavLink("Virtual Warehouses", href=f"/virtual-warehouses#days-{days_back}")),
-            dbc.NavItem(dbc.NavLink("Metabase Reports", href=f"/metabase-reports#days-{days_back}")),
-            dbc.NavItem(dbc.NavLink("Users & Tables", href=f"/users-and-tables#days-{days_back}")),
+            dbc.NavItem(dbc.NavLink("Virtual Warehouses", href=f"/profiler/virtual-warehouses#days-{days_back}")),
+            dbc.NavItem(dbc.NavLink("Metabase Reports", href=f"/profiler/metabase-reports#days-{days_back}")),
+            dbc.NavItem(dbc.NavLink("Users & Tables", href=f"/profiler/users-and-tables#days-{days_back}")),
             dbc.DropdownMenu(
                 id='days-back-dropdown',
                 children=[dbc.DropdownMenuItem(f"{days} days back", href=f"#days-{days}", active=days == days_back)
@@ -35,7 +35,7 @@ def generate_navbar(days_back: int):
             )
         ],
         brand="Metabase Profiler",
-        brand_href=f"/virtual-warehouses#days-{days_back}",
+        brand_href=f"/profiler/virtual-warehouses#days-{days_back}",
         color="primary",
         dark=True,
         fluid=True
@@ -74,11 +74,11 @@ application.layout = serve_layout
 def display_page(pathname, hash):
     if hash is not None:
         days_back = parse_days_back_hash(hash)
-    if pathname == '/virtual-warehouses':
+    if pathname == '/profiler/virtual-warehouses':
         layout = virtual_warehouses.layout(days_back)
-    elif pathname == '/metabase-reports':
+    elif pathname == '/profiler/metabase-reports':
         layout = treemap.layout(days_back)
-    elif pathname == '/users-and-tables':
+    elif pathname == '/profiler/users-and-tables':
         layout = sankey.layout(days_back)
     else:
         layout = virtual_warehouses.layout(days_back)
