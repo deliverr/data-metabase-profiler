@@ -52,13 +52,17 @@ def get_card_results_pandas(card_id: int, params: Dict[str, str]) -> pd.DataFram
         "target": ["variable", ["template-tag", key]], "value": value}
         for key, value in params.items()
     ]
-    res = cached_requests.post(f'{__METABASE_URL__}/api/card/{card_id}/query/json',
+    result = cached_requests.post(f'{__METABASE_URL__}/api/card/{card_id}/query/json',
                                data={ "parameters": json.dumps(vars) },
                                headers={'Content-Type': 'application/x-www-form-urlencoded',
                                  'X-Metabase-Session': get_metabase_token()
                                  }
                                )
-    return lower_columns(pd.DataFrame(res.json()))
+    res_json = result.json()
+    if 'json_query' in res_json:
+        print(f'SQL compilation errror: {res_json}')
+        return pd.DataFrame()
+    return lower_columns(pd.DataFrame(res_json))
 
 
 def get_all_cards(database_id=__DATABASE_ID_SNOWFLAKE__) -> Dict:

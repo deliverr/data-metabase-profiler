@@ -1,10 +1,36 @@
-from _collections import defaultdict
+from collections import defaultdict, ChainMap
 import json
+import numpy as np
 from typing import Dict, List
 import plotly
 import plotly.graph_objects as go
-from snowflake import lookup_table_size
+import sql_metadata
 from metabase import get_card_results_pandas
+
+
+def lookup_table_size(table: str) -> np.float64:
+    table_sizes_raw = get_card_results_pandas(7211, {})
+    name = table
+    if '.' in table:
+        schema, name = table.split('.')
+        matches = (table_sizes_raw['table_schema'] == schema.upper()) & \
+                  (table_sizes_raw['table_name'] == name.upper())
+        if matches.sum() > 0:
+            return table_sizes_raw[matches]['storage_usage_gb'].tolist()[0]
+    else:
+        matches = table_sizes_raw['table_name'] == name.upper()
+        # parsing of table names from SQL by sql_metadata can include column names
+        if matches.sum() > 0:
+            return table_sizes_raw[matches]['storage_usage_gb'].tolist()[0]
+
+    if name.upper().startswith('VIEW_'):
+        return lookup_table_size(name[5:])
+
+    view_ddl_df = get_card_results_pandas(7212, { 'view': name })
+    if not view_ddl_df.empty and 'ddl' in view_ddl_df.columns:
+        tables = sql_metadata.get_query_tables(view_ddl_df['ddl'].iloc[0])
+        return sum([lookup_table_size(t) for t in tables])
+    return 0.001
 
 
 def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back: int):
@@ -52,19 +78,19 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
     sources = []
     targets = []
     values = []
+    customdata = list()
     for table in card_tables:
         for card_id in card_ids_by_tables[table]:
             sources.append(labels.index(table))
             targets.append(labels.index(card_id_to_name[card_id]))
             values.append(table_sizes[table])
+            customdata.append(f'({round(table_sizes[table], 2)} GB)')
             link_colors.append(table_link_color)
-
 
     # normalize values so that table sizes and run counts have analogous visual encodings
     def normalize(list):
         max_value = max(list)
         return [v / max_value for v in list]
-
 
     values = normalize(values)
 
@@ -82,7 +108,7 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
                 user_values.append(card_runs[(card_runs.first_name == user) & (card_runs.card_id == id)].runs.tolist()[0])
         else:
             print(f"No users for for card_id {id}, {json.dumps(users_by_card_id)}")
-
+    customdata += [f'({v} runs)' for v in user_values]
     values += normalize(user_values)
 
     # draw the diagram
@@ -99,7 +125,9 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
                 source = sources,
                 target = targets,
                 value = values,
-                color = link_colors
+                customdata = customdata,
+                color = link_colors,
+                hovertemplate='%{target.label} reads %{source.label} %{customdata}<br />'
             )
         )]
     )
