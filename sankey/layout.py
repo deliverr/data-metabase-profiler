@@ -26,7 +26,7 @@ def layout(days_back: int, card_ids: List[int]):
             dbc.Col(
                 dcc.Dropdown(
                     id='cards-dropdown',
-                    options=[{'label': card['name'], 'value': card['id']} for card in report_tables],
+                    options=[{'label': f"{card['name']} ({card['id']})", 'value': card['id']} for card in report_tables],
                     value=list(card_ids),
                     multi=True
                 )
