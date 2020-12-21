@@ -31,7 +31,6 @@ def generate_navbar(days_back: int):
                 color="info",
                 style={ 'padding-right': '35px' }
             ),
-            dbc.NavItem(dbc.NavLink("Virtual Warehouses", href=f"/profiler/virtual-warehouses#days-{days_back}")),
             dbc.NavItem(dbc.NavLink("Report TreeMap", href=f"/profiler/metabase-reports#days-{days_back}")),
             dbc.NavItem(dbc.NavLink("User Hits & Table Sizes", href=f"/profiler/users-and-tables#days-{days_back}")),
         ],

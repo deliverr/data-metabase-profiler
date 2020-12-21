@@ -10,25 +10,20 @@ from .metabase_table_usage_sankey import sankey
 
 with open('metabase/report-tables-Snowflake.json', 'r') as infile:
     report_tables = json.load(infile)
+    report_options = [{'label': f"{card['name']} ({card['id']})", 'value': card['id']} for card in report_tables]
+    reports_by_id = { card['id']: card for card in report_tables}
 
 
 def layout(days_back: int, card_ids: List[int]):
-    card_id_to_name = {
-        4310: 'Rolling_90_Warehouse_Daily_Vol',
-        3695: '[cse center] seller sku category opportunities',
-        520: 'Log of cdsku'
-    }
-    if len(card_ids) == 0:
-        card_ids = list(card_id_to_name.keys())
-
     selection_row = dbc.Row(
         [
             dbc.Col(
                 dcc.Dropdown(
                     id='cards-dropdown',
-                    options=[{'label': f"{card['name']} ({card['id']})", 'value': card['id']} for card in report_tables],
+                    options=report_options,
                     value=list(card_ids),
-                    multi=True
+                    multi=True,
+                    placeholder='Select report(s)...'
                 )
             )
         ]
@@ -36,7 +31,7 @@ def layout(days_back: int, card_ids: List[int]):
     sankey_diagram_row = dbc.Row(
         [
             dbc.Col(
-                dcc.Graph(id='sankey', figure=sankey(report_tables, card_id_to_name, days_back)), width=12
+                dcc.Graph(id='sankey', figure=sankey(reports_by_id, card_ids, days_back)), width=12
             )
         ]
     )
@@ -53,19 +48,19 @@ def layout(days_back: int, card_ids: List[int]):
     ])
 
 
-def get_card_by_id(id: int) -> Dict:
-    for card in report_tables:
-        if card['id'] == id:
-            return card
-    return None
+@application.callback(
+    Output('card-ids', 'children'),
+    [Input('cards-dropdown', 'value')])
+def update_output(card_ids):
+    return card_ids
 
 
 @application.callback(
     Output('sankey', 'figure'),
-    [Input('cards-dropdown', 'value'), Input('days-back', 'children')])
-def update_output(value, days_back):
+    [Input('card-ids', 'children'), Input('days-back', 'children')])
+def update_cards(card_ids, days_back):
     return sankey(
-        report_tables,
-        { id: get_card_by_id(id)['name'] for id in value },
+        reports_by_id,
+        card_ids,
         days_back
     )
