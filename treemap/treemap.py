@@ -9,7 +9,7 @@ def treemap(days_back: int):
     df = df[df.period == 'this']
     n = 200
     total_cost = snow.total_cost_by_warehouse(days_back, 'dataviz_tool_wh')
-    df["root"] = f"Deliverr"
+    df["root"] = f"Deliverr Top {n}"
     df["cost"] = (df.proportion * total_cost).round(2)
     df["percentage"] = df.proportion * 100
     df["change"] = (df.query_time_pct_change * 100).round(2)
