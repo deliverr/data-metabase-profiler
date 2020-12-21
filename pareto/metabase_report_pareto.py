@@ -48,7 +48,7 @@ def pareto_chart(days_back: int):
     }
     data = Data([trace1, trace2, trace3])
     layout = {
-        "title": f"{int(percentile)}% of dataviz_tool_wh went to {n} Metabase reports over the last {days_back} days",
+        "title": f"{n} reports accounted for {int(percentile)}% of dataviz_tool_wh cost over the last {days_back} days",
         "width": 1500,
         "xaxis": {"tickangle": -90},
         "yaxis": {
