@@ -132,7 +132,7 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
         )]
     )
 
-    fig.update_layout(title_text="Metabase Report tables (scaled by data size) and users (scaled by number of hits)",
+    fig.update_layout(title_text=f"Report User hits and Source Table sizes, last {days_back} days",
                       font_size=12,
                       height=700)
     return fig

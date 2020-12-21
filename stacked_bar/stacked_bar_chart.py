@@ -22,7 +22,7 @@ def stacked_bar_chart(days_back: int):
         "date",
         y="$ cost",
         color="virtual warehouse",
-        title="Daily Cost per Warehouse",
+        title=f"Daily Cost per Virtual Warehouse, last {days_back} days",
         category_orders={"virtual warehouse": warehouse_names},
         color_discrete_sequence=plotly.colors.qualitative.Set2 # Dark2 # D3
     )

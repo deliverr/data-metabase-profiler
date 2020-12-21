@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -12,12 +12,14 @@ with open('metabase/report-tables-Snowflake.json', 'r') as infile:
     report_tables = json.load(infile)
 
 
-def layout(days_back: int):
+def layout(days_back: int, card_ids: List[int]):
     card_id_to_name = {
         4310: 'Rolling_90_Warehouse_Daily_Vol',
         3695: '[cse center] seller sku category opportunities',
         520: 'Log of cdsku'
     }
+    if len(card_ids) == 0:
+        card_ids = list(card_id_to_name.keys())
 
     selection_row = dbc.Row(
         [
@@ -25,7 +27,7 @@ def layout(days_back: int):
                 dcc.Dropdown(
                     id='cards-dropdown',
                     options=[{'label': card['name'], 'value': card['id']} for card in report_tables],
-                    value=list(card_id_to_name.keys()),
+                    value=list(card_ids),
                     multi=True
                 )
             )
@@ -60,10 +62,10 @@ def get_card_by_id(id: int) -> Dict:
 
 @application.callback(
     Output('sankey', 'figure'),
-    [Input('cards-dropdown', 'value')])
-def update_output(value):
+    [Input('cards-dropdown', 'value'), Input('days-back', 'children')])
+def update_output(value, days_back):
     return sankey(
         report_tables,
         { id: get_card_by_id(id)['name'] for id in value },
-        30
+        days_back
     )
