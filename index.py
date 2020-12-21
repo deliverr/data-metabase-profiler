@@ -21,24 +21,24 @@ def parse_days_back_hash(hash: str) -> int:
 def generate_navbar(days_back: int):
     return dbc.NavbarSimple(
         children=[
-            dbc.NavItem(dbc.NavLink("Virtual Warehouses", href=f"/profiler/virtual-warehouses#days-{days_back}")),
-            dbc.NavItem(dbc.NavLink("Metabase Reports", href=f"/profiler/metabase-reports#days-{days_back}")),
-            dbc.NavItem(dbc.NavLink("Users & Tables", href=f"/profiler/users-and-tables#days-{days_back}")),
             dbc.DropdownMenu(
                 id='days-back-dropdown',
-                children=[dbc.DropdownMenuItem(f"{days} days back", href=f"#days-{days}", active=days == days_back)
+                children=[dbc.DropdownMenuItem(f"last {days} days", href=f"#days-{days}", active=days == days_back)
                           for days in [14, 30]],
                 nav=False,
                 in_navbar=True,
-                label=f"{days_back} days back",
-                color="info"
-            )
+                label=f"last {days_back} days",
+                color="info",
+                style={ 'padding-right': '35px' }
+            ),
+            dbc.NavItem(dbc.NavLink("Report TreeMap", href=f"/profiler/metabase-reports#days-{days_back}")),
+            dbc.NavItem(dbc.NavLink("User Hits & Table Sizes", href=f"/profiler/users-and-tables#days-{days_back}")),
         ],
         brand="Metabase Profiler",
         brand_href=f"/profiler/virtual-warehouses#days-{days_back}",
         color="primary",
         dark=True,
-        fluid=True
+        fluid=False
     )
 
 
@@ -58,7 +58,8 @@ def serve_layout():
         ]),
         dbc.Row([
             dbc.Col([
-                html.Div(id='page-content', children=[])
+                html.Div(id='page-content', children=[]),
+                html.Div(id='card-ids', hidden=True, children=[]),
             ], width=12)
         ])
     ])
@@ -70,8 +71,8 @@ application.layout = serve_layout
 @application.callback(Output('page-content', 'children'),
                       Output('days-back', 'children'),
                       Output('navbar', 'children'),
-                      [Input('url', 'pathname'), Input('url', 'hash')])
-def display_page(pathname, hash):
+                      [Input('url', 'pathname'), Input('url', 'hash'), Input('card-ids', 'children')])
+def display_page(pathname, hash, card_ids):
     if hash is not None:
         days_back = parse_days_back_hash(hash)
     if pathname == '/profiler/virtual-warehouses':
@@ -79,7 +80,7 @@ def display_page(pathname, hash):
     elif pathname == '/profiler/metabase-reports':
         layout = treemap.layout(days_back)
     elif pathname == '/profiler/users-and-tables':
-        layout = sankey.layout(days_back)
+        layout = sankey.layout(days_back, card_ids)
     else:
         layout = virtual_warehouses.layout(days_back)
     return layout, days_back, generate_navbar(days_back)

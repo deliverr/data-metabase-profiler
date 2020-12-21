@@ -10,16 +10,16 @@ def pareto_chart(days_back: int):
     df = get_card_results_pandas(5705, {'days_back': days_back})
     df['dollars'] = df.proportion * total_dollars
     df["cum_percentage"] = df.cum_proportion * 100
+    df['report'] = df.card_name.str.slice(0, 52) + ' (' + df['card_id'].astype(str) + ')'
     df.cum_percentage = df.cum_percentage.round(2)
     df = df[df.cum_percentage <= percentile]
     n = df.shape[0]
 
-    df.card_name = df.card_name.str.slice(0, 52)
 
     trace1 = {
         "name": "$ Cost",
         "type": "bar",
-        "x": df['card_name'],
+        "x": df['report'],
         "y": df.dollars,
         "marker": {"color": "rgb(231, 138, 195)"}
     }
@@ -30,7 +30,7 @@ def pareto_chart(days_back: int):
         },
         "name": "% Cumulative",
         "type": "scatter",
-        "x": df['card_name'],
+        "x": df['report'],
         'y': df['cum_percentage'],
         "yaxis": "y2"
     }
@@ -42,13 +42,13 @@ def pareto_chart(days_back: int):
         },
         "name": "25%",
         "type": "scatter",
-        "x": df['card_name'],
+        "x": df['report'],
         "y": [25 for i in range(0, n)],
         "yaxis": "y2"
     }
     data = Data([trace1, trace2, trace3])
     layout = {
-        "title": f"{int(percentile)}% of dataviz_tool_wh goes to {n} Metabase reports",
+        "title": f"{n} reports accounted for {int(percentile)}% of dataviz_tool_wh cost over the last {days_back} days",
         "width": 1500,
         "xaxis": {"tickangle": -90},
         "yaxis": {

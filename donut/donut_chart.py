@@ -25,7 +25,7 @@ def donut_chart(days_back: int):
        pie
     ])
     fig.update_layout(
-       title_text="Snowflake Cost by Warehouse",
+       title_text=f"Snowflake Cost by Virtual Warehouse, last {days_back} days",
        # Add annotations in the center of the donut pies.
        annotations=[dict(text="${:.1f}K".format(df.total_cost.sum() / 1000),
                          x=0.5, y=0.5, font_size=14, showarrow=False)])

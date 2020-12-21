@@ -3,6 +3,7 @@ import snowflake as snow
 from metabase import get_card_results_pandas
 import plotly
 
+
 def stacked_bar_chart(days_back: int):
     df = get_card_results_pandas(3218, {'days_back': days_back})
     df['warehouse_name'] = df.warehouse_name.str.lower()
@@ -13,7 +14,6 @@ def stacked_bar_chart(days_back: int):
         .tolist()
 
     df = snow.cost_from_credits(df, 'warehouse_credits_used', 'warehouse_cost')
-    #snow.cost_from_credits(df, 'total_credits_used', 'total_cost')
     df['$ cost'] = df.warehouse_cost
     df['date'] = df.usage_date
     df['virtual warehouse'] = df.warehouse_name
@@ -22,7 +22,7 @@ def stacked_bar_chart(days_back: int):
         "date",
         y="$ cost",
         color="virtual warehouse",
-        title="Daily Cost per Warehouse",
+        title=f"Daily Cost per Virtual Warehouse",
         category_orders={"virtual warehouse": warehouse_names},
         color_discrete_sequence=plotly.colors.qualitative.Set2 # Dark2 # D3
     )

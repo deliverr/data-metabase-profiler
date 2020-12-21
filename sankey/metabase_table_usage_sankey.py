@@ -33,10 +33,10 @@ def lookup_table_size(table: str) -> np.float64:
     return 0.001
 
 
-def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back: int):
+def sankey(reports_by_id: Dict[int, Dict], card_ids: List[int], days_back: int):
     # load report card data, including table names and count of runs
-    card_ids = sorted(list(card_id_to_name.keys()))
-    card_names = [card_id_to_name[id] for id in card_ids]
+    selected_cards = [reports_by_id[id] for id in card_ids]
+    card_id_to_name = { card['id']: card['name'] for card in selected_cards }
 
     # greys from https://colorbrewer2.org/#type=sequential&scheme=Greys&n=9
     table_color = '#f7f7f7'
@@ -48,7 +48,7 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
     assert len(card_ids) <= len(card_colors)
     card_ids_to_color = { id: index for index, id in enumerate(card_ids) }
 
-    tables_by_card_id = { card['id']: card['tables'] for card in report_tables if card['id'] in card_ids }
+    tables_by_card_id = { card['id']: card['tables'] for card in selected_cards }
 
     report_runs = get_card_results_pandas(6937, { 'days_back': days_back })
     card_runs = report_runs[report_runs.card_id.isin(card_ids)]
@@ -64,11 +64,10 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
         table_sizes[table] = lookup_table_size(table)
 
     # prep labels, source, target and value network fields for Sankey diagram
-    labels = card_tables + card_names + users
+    labels = card_tables + list(card_id_to_name.values()) + users
     node_colors = [table_color for t in card_tables] + \
              [card_colors[card_ids_to_color[id]] for id in card_ids] + \
              [user_color for u in users]
-    card_indices = [len(card_tables)] + [len(card_tables) + i for i in range(1, len(card_ids) + 2)]
     card_ids_by_tables = defaultdict(list)
     for card_id, tables in tables_by_card_id.items():
         for table in tables:
@@ -89,6 +88,8 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
 
     # normalize values so that table sizes and run counts have analogous visual encodings
     def normalize(list):
+        if len(list) == 0:
+            return list
         max_value = max(list)
         return [v / max_value for v in list]
 
@@ -132,7 +133,7 @@ def sankey(report_tables: List[Dict], card_id_to_name: Dict[int, str], days_back
         )]
     )
 
-    fig.update_layout(title_text="Metabase Report tables (scaled by data size) and users (scaled by number of hits)",
+    fig.update_layout(title_text=f"Report User hits and Source Table sizes, last {days_back} days",
                       font_size=12,
                       height=700)
     return fig

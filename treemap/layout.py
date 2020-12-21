@@ -5,7 +5,7 @@ from .treemap import treemap
 
 
 def layout(days_back: int):
-    content_first_row = dbc.Row(
+    treemap_row = dbc.Row(
         [
             dbc.Col(
                 dcc.Graph(id='treemap', figure=treemap(days_back)), width=12
@@ -15,7 +15,7 @@ def layout(days_back: int):
 
     content = html.Div(
         [
-            content_first_row
+            treemap_row
         ]
     )
 
